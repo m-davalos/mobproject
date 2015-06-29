@@ -1,0 +1,22 @@
+require 'selenium-webdriver'
+require 'appium_lib'
+
+driver = start_selenium_driver
+
+Before do
+  @driver = driver
+end
+
+After do |scenario|
+  if scenario.failed?
+    take_screenshot(scenario, @driver)
+  end
+end
+
+at_exit do
+  system "adb shell pm uninstall -k #{$android_package}.#{$station}" if ENV['PLATFORM'] == 'android'
+  spawn 'killall "iOS Simulator"' if ENV['PLATFORM'] == 'ios'
+
+  puts 'Terminated appium server session'
+  system 'pkill node'
+end

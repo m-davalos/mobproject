@@ -11,6 +11,7 @@ After do |scenario|
   if scenario.failed?
     take_screenshot(scenario, @driver)
   end
+  @driver.reset
 end
 
 at_exit do

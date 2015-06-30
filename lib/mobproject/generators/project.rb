@@ -6,11 +6,6 @@ module MobProject
       include Thor::Actions
 
       argument :name, :type => :string, :desc => 'The name of the project'
-      # argument :name, :type => :string, :desc => 'The name of the project'
-      # argument :pageobject_driver, :type => :string, :desc => 'Driver to use with PageObject'
-      # argument :with_lib, :type => :string, :desc => 'Place all shared objects in the lib directory'
-      # argument :with_gametel, :type => :string, :desc => 'Add support for the gametel gem'
-      # argument :with_mohawk, :type => :string, :desc => 'Add support for the mohawk gem'
       desc "Generates a project structure for testing with Cucumber"
 
       def self.source_root

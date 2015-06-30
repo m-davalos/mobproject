@@ -46,25 +46,6 @@ module MobProject
       #   empty_directory("#{name}/lib") if gen_lib
       # end
       #
-      # def create_pages_directory
-      #   if gen_lib
-      #     empty_directory("#{name}/lib/pages") unless no_driver_selected
-      #     empty_directory("#{name}/lib/screens") if with_gametel == 'true' or with_mohawk == 'true'
-      #   else
-      #     empty_directory("#{name}/features/support/pages") unless no_driver_selected
-      #     empty_directory("#{name}/features/support/screens") if with_gametel == 'true' or with_mohawk == 'true'
-      #   end
-      # end
-
-      # private
-      #
-      # def no_driver_selected
-      #   pageobject_driver.downcase == 'none'
-      # end
-      #
-      # def gen_lib
-      #   with_lib == 'true'
-      # end
     end
   end
 end

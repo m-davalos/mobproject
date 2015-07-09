@@ -1,0 +1,17 @@
+require_relative 'mobile/platform/platforms'
+extend Mobile::Platform
+
+
+android do
+  # $android_package = '<YOUR ANDROID PACKAGE>'
+  # $apk = "<YOUR APK>"
+  # $apk_path = "<YOUR APK PATH>"
+  # $android_activity = '<YOUR ANDROID MAIN ACTIVITY>'
+  # $android_test_device = ENV['DEVICE']
+  # $device_version = ENV['VERSION'] if ENV['TARGET'] == 'sauce'
+end
+
+ios do
+  #TODO
+  $simulator = ENV['DEVICE']
+end

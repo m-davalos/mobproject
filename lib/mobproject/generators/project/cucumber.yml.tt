@@ -1,0 +1,11 @@
+android_avd: --no-source --color --format pretty PLATFORM=android ANDROID_PHONE=emulator TARGET=local_android_emulator --tags ~@ignore --tags ~@wip
+
+android_device: --no-source --color --format pretty PLATFORM=android ANDROID_PHONE=device TARGET=local_android_device --tags ~@ignore --tags ~@wip
+
+sauce_android_avd: --no-source --color --format pretty PLATFORM=android ANDROID_PHONE=emulator TARGET=sauce --tags ~@ignore --tags ~@wip
+
+ios_simulator: --no-source --color --format pretty PLATFORM=ios IOS_PHONE=simulator TARGET=local_android_device --tags ~@ignore --tags ~@wip
+
+ios_device: --no-source --color --format pretty PLATFORM=ios IOS_PHONE=device TARGET=local_ios_device --tags ~@ignore --tags ~@wip
+
+sauce_ios_simulator: --no-source --color --format pretty PLATFORM=ios IOS_PHONE=simulator TARGET=sauce --tags ~@ignore --tags ~@wip

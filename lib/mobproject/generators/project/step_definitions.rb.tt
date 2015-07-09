@@ -1,0 +1,4 @@
+# This is a place holder.
+Given(/^I Start the Application$/) do
+    sleep 5
+end

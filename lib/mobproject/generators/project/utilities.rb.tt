@@ -1,0 +1,23 @@
+module Utils
+  def take_screenshot(scenario, driver)
+    dt = Time.new
+    screenshot_name = "#{ENV['PLATFORM']}_#{ENV['DEVICE']}_#{scenario.name.gsub(' ','_').gsub(/[^0-9A-Za-z_]/, '')}_#{dt.day}#{dt.hour}#{dt.min}#{dt.sec}.png"
+    screenshot = Dir.pwd + '/features/results/' + screenshot_name
+    save_and_embed_image(screenshot, driver)
+  end
+
+  def save_screenshot_locally(name, driver)
+    dt = Time.new
+    screenshot_name = "#{name}_#{dt.day}#{dt.hour}#{dt.min}#{dt.sec}.png"
+    dir = Dir.home + '/Screenshots'
+    Dir.mkdir(dir) unless Dir.exist?(dir)
+    screenshot = dir + '/' + screenshot_name
+    driver.save_screenshot(screenshot)
+  end
+
+  private
+  def save_and_embed_image(path, driver)
+    driver.save_screenshot(path)
+    embed(path, "image/png")
+  end
+end

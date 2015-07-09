@@ -1,1 +1,166 @@
-#Rake
+require 'rubygems'
+require 'cucumber'
+require 'cucumber/rake/task'
+require 'rake/task'
+
+#TODO - Clean up
+Cucumber::Rake::Task.new(:features) do |t|
+  t.profile = 'default'
+end
+
+Cucumber::Rake::Task.new(:api) do |t|
+  t.profile = 'api'
+end
+
+task :DEFAULT => :features
+
+task :android_avd, [:tag, :avd] do |t, args|
+  Cucumber::Rake::Task.new :cucumber_android_avd do |t|
+    ENV['DEVICE'] = args[:avd].to_s.gsub('avd:', '').strip
+
+    emulator = ENV['DEVICE']
+    tag = args[:tag]
+
+    t.profile = 'android_avd'
+
+    if tag.nil?
+      t.cucumber_opts = html_report
+    else
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Android_#{emulator}")}"
+    end
+  end
+
+  Rake::Task[:cucumber_android_avd].invoke
+end
+
+task :sauce_android_avd, [:tag, :avd] do |t, args|
+  Cucumber::Rake::Task.new :cucumber_android_avd do |t|
+    device = args[:avd].to_s.gsub('avd:', '').strip
+    #TODO
+    # ENV['DEVICE'] = lookup_sauce_device_name(device)
+    # ENV['DEVICE_VERSION'] = lookup_sauce_device_name(:version)
+    ENV['DEVICE'] = 'Samsung Galaxy S4 Emulator'
+    ENV['VERSION'] = '4.4'
+
+    tag = args[:tag]
+
+    t.profile = 'sauce_android_avd'
+
+    if tag.nil?
+      t.cucumber_opts = html_report
+    else
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Sauce_Android_#{device}")}"
+    end
+  end
+
+  Rake::Task[:cucumber_android_avd].invoke
+end
+
+task :ios_simulator, [:tag, :simulator] do |t, args|
+  Cucumber::Rake::Task.new :cucumber_ios_simulator do |t|
+    ENV['DEVICE'] = args[:simulator].to_s.gsub('simulator:', '').strip
+
+    simulator = ENV['DEVICE']
+    tag = args[:tag]
+
+    t.profile = 'ios_simulator'
+
+    if tag.nil?
+      t.cucumber_opts = html_report
+    else
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("iOS_#{simulator}")}"
+    end
+  end
+
+  Rake::Task[:cucumber_ios_simulator].invoke
+end
+
+task :android_avds, [:tag, :devices] do |t, args|
+  $devices = args[:devices]
+  $tag = args[:tag]
+
+  if $devices.to_s.downcase == 'all'
+    devices = all_android_emulators
+    $devices = devices.map { |device| "avd:#{device}" }
+  end
+
+  require_relative 'hack.rb'
+end
+
+task :android_device, [:tag, :device] do |t, args|
+  Cucumber::Rake::Task.new :cucumber_android_device do |t|
+    devices = all_android_devices
+    test_device_name = args[:device].to_s.gsub('device:', '').strip
+    device_name = devices.values_at(test_device_name)
+    tag = args[:tag]
+
+    ENV['DEVICE'] = device_name.first
+
+    device = ENV['DEVICE']
+
+    t.profile = 'android_device'
+
+    if tag.nil?
+      t.cucumber_opts = html_report
+    else
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Android_#{device}")}"
+    end
+  end
+
+  Rake::Task[:cucumber_android_device].invoke
+end
+
+def create_directory(path, dir_name)
+  dir = "#{path}/#{dir_name}"
+  Dir.mkdir(path) unless Dir.exist? path
+  Dir.mkdir(dir) unless Dir.exist? dir
+end
+
+def all_android_emulators
+  require 'yaml'
+
+  YAML.load_file(Dir.pwd + '/features/support/mobile/platform/android/inventory/emulators.yml')
+end
+
+def all_android_devices
+  require 'yaml'
+
+  YAML.load_file(Dir.pwd + '/features/support/mobile/platform/android/inventory/devices.yml')
+end
+
+def ios_device_from_yml(name)
+  require 'yaml'
+
+  YAML.load_file(Dir.pwd + '/features/support/mobile/platform/ios/inventory/devices.yml').first[name]
+end
+
+def android_device_from_yml(name)
+  require 'yaml'
+
+  YAML.load_file(Dir.pwd + '/features/support/mobile/platform/android/inventory/devices.yml')[name]
+end
+
+def path_to_results_folder
+  "#{Dir.pwd}/features/results"
+end
+
+def date_folder
+  dt = Time.new
+
+  "#{dt.year}#{dt.month}#{dt.day}"
+end
+
+def unique_postfix
+  dt = Time.new
+
+  "#{dt.hour}#{dt.min}#{dt.sec}"
+end
+
+def html_report_flag(name)
+  path = path_to_results_folder
+  date_dir = date_folder
+  uniq_postfix = unique_postfix
+  create_directory(path, date_dir)
+  report_name = "#{name}_#{uniq_postfix}.html"
+  "-f html --out #{path}/#{date_dir}/#{report_name}"
+end

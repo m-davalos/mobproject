@@ -9,5 +9,8 @@ Gem::Specification.new do |s|
   s.files       = ['lib/mobproject.rb', 'lib/mobproject/generators/project.rb', 'lib/mobproject/cli.rb']
   s.homepage    = 'https://github.com/m-davalos/mobproject'
   s.license       = 'Mobiquity, Inc.'
-  s.add_development_dependency 'thor'
+  s.executables = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.require_paths = ["lib"]
+  s.add_dependency 'require_all'
+  s.add_dependency 'thor'
 end

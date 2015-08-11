@@ -3,21 +3,37 @@ require 'appium_lib'
 
 driver = start_selenium_driver
 
+bool_status = false
+
 Before do
   @driver = driver
 end
 
 After do |scenario|
+  if scenario.passed?
+    bool_status = true
+  end
+
   if scenario.failed?
     take_screenshot(scenario, @driver)
   end
+
   @driver.reset
 end
 
 at_exit do
-  system "adb shell pm uninstall -k #{$android_package}.#{$station}" if ENV['PLATFORM'] == 'android'
-  spawn 'killall "iOS Simulator"' if ENV['PLATFORM'] == 'ios'
+  if ENV['TARGET'] != 'sauce'
+    system "adb shell pm uninstall -k #{android_settings[:android_package]}" if ENV['PLATFORM'] == 'android'
+    terminate_simulator if ENV['PLATFORM'] == 'ios'
+    puts 'Terminated appium server session'
+    system 'pkill node'
+  else
+    require 'sauce_whisk'
 
-  puts 'Terminated appium server session'
-  system 'pkill node'
+    ENV['SAUCE_USERNAME'] = %x[echo $SAUCE_USER].strip
+    ENV['SAUCE_ACCESS_KEY'] = %x[echo $SAUCE_KEY].strip
+
+    SauceWhisk::Jobs.change_status $driver.driver.session_id, bool_status
+    driver.quit
+  end
 end

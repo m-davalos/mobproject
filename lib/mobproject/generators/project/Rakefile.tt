@@ -24,7 +24,7 @@ task :android_avd, [:tag, :avd] do |t, args|
     t.profile = 'android_avd'
 
     if tag.nil?
-      t.cucumber_opts = html_report
+      t.cucumber_opts = html_report_flag("Android_#{emulator}")
     else
       t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Android_#{emulator}")}"
     end
@@ -35,21 +35,20 @@ end
 
 task :sauce_android_avd, [:tag, :avd] do |t, args|
   Cucumber::Rake::Task.new :cucumber_android_avd do |t|
-    device = args[:avd].to_s.gsub('avd:', '').strip
-    #TODO
-    # ENV['DEVICE'] = lookup_sauce_device_name(device)
-    # ENV['DEVICE_VERSION'] = lookup_sauce_device_name(:version)
-    ENV['DEVICE'] = 'Samsung Galaxy S4 Emulator'
-    ENV['VERSION'] = '4.4'
+    test_device_name = args[:avd].to_s.gsub('avd:', '').strip
+    device_info = sauce_emulator_from_yml(test_device_name)
+
+    ENV['DEVICE'] = device_info['name']
+    ENV['VERSION'] = device_info['version']
 
     tag = args[:tag]
 
     t.profile = 'sauce_android_avd'
 
     if tag.nil?
-      t.cucumber_opts = html_report
+      t.cucumber_opts = html_report_flag("Sauce_Android_#{test_device_name}")
     else
-      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Sauce_Android_#{device}")}"
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Sauce_Android_#{test_device_name}")}"
     end
   end
 
@@ -58,17 +57,39 @@ end
 
 task :ios_simulator, [:tag, :simulator] do |t, args|
   Cucumber::Rake::Task.new :cucumber_ios_simulator do |t|
-    ENV['DEVICE'] = args[:simulator].to_s.gsub('simulator:', '').strip
-
-    simulator = ENV['DEVICE']
+    test_device_name = args[:simulator].to_s.gsub('simulator:', '').strip
+    device_info = ios_simulator_from_yml(test_device_name)
+    ENV['DEVICE'] = device_info['name']
+    ENV['VERSION'] = device_info['version']
     tag = args[:tag]
 
     t.profile = 'ios_simulator'
 
     if tag.nil?
-      t.cucumber_opts = html_report
+      t.cucumber_opts = html_report_flag("iOS_#{test_device_name}")
     else
-      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("iOS_#{simulator}")}"
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("iOS_#{test_device_name}")}"
+    end
+  end
+
+  Rake::Task[:cucumber_ios_simulator].invoke
+end
+
+task :sauce_ios_simulator, [:tag, :simulator] do |t, args|
+  Cucumber::Rake::Task.new :cucumber_ios_simulator do |t|
+    test_device_name = args[:simulator].to_s.gsub('simulator:', '').strip
+    device_info = sauce_simulator_from_yml(test_device_name)
+    ENV['DEVICE'] = device_info['name']
+    ENV['VERSION'] = device_info['version']
+
+    tag = args[:tag]
+
+    t.profile = 'sauce_ios_simulator'
+
+    if tag.nil?
+      t.cucumber_opts = html_report_flag("Sauce_iOS_#{test_device_name}")
+    else
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Sauce_iOS_#{test_device_name}")}"
     end
   end
 
@@ -101,7 +122,7 @@ task :android_device, [:tag, :device] do |t, args|
     t.profile = 'android_device'
 
     if tag.nil?
-      t.cucumber_opts = html_report
+      t.cucumber_opts = html_report_flag("Android_#{device}")
     else
       t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Android_#{device}")}"
     end
@@ -109,6 +130,7 @@ task :android_device, [:tag, :device] do |t, args|
 
   Rake::Task[:cucumber_android_device].invoke
 end
+
 
 def create_directory(path, dir_name)
   dir = "#{path}/#{dir_name}"
@@ -131,7 +153,29 @@ end
 def ios_device_from_yml(name)
   require 'yaml'
 
-  YAML.load_file(Dir.pwd + '/features/support/mobile/platform/ios/inventory/devices.yml').first[name]
+  devices = YAML.load_file(Dir.pwd + '/features/support/mobile/platform/ios/inventory/devices.yml')
+  devices[name]
+end
+
+def ios_simulator_from_yml(name)
+  require 'yaml'
+
+  simulators = YAML.load_file(Dir.pwd + '/features/support/mobile/platform/ios/inventory/simulators.yml')
+  simulators[name]
+end
+
+def sauce_emulator_from_yml(name)
+  require 'yaml'
+
+  emulators = YAML.load_file(Dir.pwd + '/features/support/mobile/platform/android/inventory/sauce.yml')
+  emulators[name]
+end
+
+def sauce_simulator_from_yml(name)
+  require 'yaml'
+
+  emulators = YAML.load_file(Dir.pwd + '/features/support/mobile/platform/ios/inventory/sauce.yml')
+  emulators[name]
 end
 
 def android_device_from_yml(name)
@@ -153,7 +197,7 @@ end
 def unique_postfix
   dt = Time.new
 
-  "#{dt.hour}#{dt.min}#{dt.sec}"
+  "#{dt.hour}_#{dt.min}_#{dt.sec}"
 end
 
 def html_report_flag(name)
@@ -161,6 +205,6 @@ def html_report_flag(name)
   date_dir = date_folder
   uniq_postfix = unique_postfix
   create_directory(path, date_dir)
-  report_name = "#{name}_#{uniq_postfix}.html"
+  report_name = "#{name}__#{uniq_postfix}.html"
   "-f html --out #{path}/#{date_dir}/#{report_name}"
 end

@@ -1,6 +1,0 @@
-@test
-Feature: Installation Test
-  This is a place holder
-
-  Scenario:
-    Given I Start the Application

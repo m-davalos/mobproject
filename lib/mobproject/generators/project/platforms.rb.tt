@@ -7,5 +7,9 @@ module Mobile
     def ios(&block)
       yield block if ENV['PLATFORM'] == 'ios'
     end
+
+    def web(&block)
+      yield block if ENV['PLATFORM'] == 'web'
+    end
   end
 end

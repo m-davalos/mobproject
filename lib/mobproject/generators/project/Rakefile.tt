@@ -131,6 +131,25 @@ task :android_device, [:tag, :device] do |t, args|
   Rake::Task[:cucumber_android_device].invoke
 end
 
+task: web, [:tag, :browser] do |t, args|
+  Cucumber::Rake::Task.new :cucumber_web do |t|
+    ENV['BROWSER'] = arg[:browser].to_s.gsub('browser:', '').strip
+
+    browser = ENV['BROWSER']
+    tag = arg[:tag]
+
+    t.profile = 'web'
+
+    if tag.nil?
+      t.cucumber_opts = html_report_flag("Web_#{browser}")
+    else
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Web_#{browser}")}"
+    end
+  end
+
+  Rake::Task[:cucumber_web].invoke
+end
+
 
 def create_directory(path, dir_name)
   dir = "#{path}/#{dir_name}"

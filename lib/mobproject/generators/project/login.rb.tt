@@ -1,12 +1,8 @@
-require_relative '../../support/mobile/platform/platforms'
+#------------------------------------------------------------------
+# FOLLOW THE BELLOW EXAMPLE TO CREATE YOUR PAGE OBJECT CLASSES
+#------------------------------------------------------------------
 
-class Login
-  extend Mobile::Platform
-  extend PageObject::Accessors
-
-  def initialize(selenium_driver)
-    @driver = selenium_driver
-  end
+class Login < MobTest::Base
 
   ios do
     text_field(:username, name: 'username')
@@ -20,6 +16,12 @@ class Login
     button(:login, id: 'android:id/login')
   end
 
+  web do
+    text_field(:username, id: 'username')
+    text_field(:password, name: 'password')
+    button(:login, name: 'login')
+  end
+
   ios do
     #place your ios specific methods within this block
   end
@@ -28,5 +30,9 @@ class Login
     #place your android specific methods within this block
   end
 
-  #place methods that apply to both platforms outside the blocks
+  web do
+    #place your web specific methods within this block
+  end
+
+  #place methods that apply to all platforms outside the blocks
 end

@@ -26,6 +26,11 @@ module Platform
       Appium::Driver.new(capabilities).start_driver
     end
 
+    def setup_web
+      browser = ENV['BROWSER']
+      Selenium::WebDriver.for browser.to_sym
+    end
+
     def android_capabilities
       caps = android_settings
 

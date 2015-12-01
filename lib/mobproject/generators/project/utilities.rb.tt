@@ -4,7 +4,7 @@ module Utils
     path = "#{Dir.pwd}/features/results"
     date_dir = "#{dt.year}#{dt.month}#{dt.day}"
     create_directory(path, date_dir)
-    screenshot_name = "#{ENV['PLATFORM']}_#{ENV['DEVICE']}_#{scenario.name.gsub(' ', '_').gsub(/[^0-9A-Za-z_]/, '')}__#{dt.hour}_#{dt.min}_#{dt.sec}.png"
+    screenshot_name = "#{ENV['PLATFORM']}_#{ENV['DEVICE']}_#{scenario.name.gsub(' ', '_').gsub(/[^0-9A-Za-z_]/, '')}_#{dt.hour}_#{dt.min}_#{dt.sec}.png"
     screenshot = Dir.pwd + '/features/results/' + date_dir + '/' + screenshot_name
     save_and_embed_image(screenshot, driver)
   end

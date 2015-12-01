@@ -3,7 +3,6 @@ require 'cucumber'
 require 'cucumber/rake/task'
 require 'rake/task'
 
-#TODO - Clean up
 Cucumber::Rake::Task.new(:features) do |t|
   t.profile = 'default'
 end
@@ -13,6 +12,23 @@ Cucumber::Rake::Task.new(:api) do |t|
 end
 
 task :DEFAULT => :features
+
+task :web, [:tag, :browser] do |t, args|
+  Cucumber::Rake::Task.new :cucumber_web do |t|
+    ENV['BROWSER'] = args[:browser].to_s.gsub('browser:', '').strip
+    browser = ENV['BROWSER']
+    tag = args[:tag]
+    t.profile = 'web'
+
+    if tag.nil?
+      t.cucumber_opts = html_report_flag("Web_#{browser}")
+    else
+      t.cucumber_opts = "--tags @#{tag.gsub('@', '')} #{html_report_flag("Web_#{browser}")}"
+    end
+  end
+
+  Rake::Task[:cucumber_web].invoke
+end
 
 task :android_avd, [:tag, :avd] do |t, args|
   Cucumber::Rake::Task.new :cucumber_android_avd do |t|

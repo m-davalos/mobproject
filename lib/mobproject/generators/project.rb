@@ -56,7 +56,7 @@ module MobProject
       end
 
       def copy_base
-        template "base.rb.tt", "#{name}/features/support/base.rb}"
+        template "base.rb.tt", "#{name}/features/support/base.rb"
       end
 
       def copy_hooks

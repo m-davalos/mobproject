@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
-  s.name        = 'mobprojectTest'
-  s.version     = '0.0.1'
+  s.name        = 'mobproject'
+  s.version     = '0.0.2'
   s.date        = '2015-07-20'
   s.summary     = 'Creates a project directory to test mobile and web applications with Appium/Selenium and Cucumber'
   s.description = 'Creates a project directory test iOS, Android mobile and Web applications with Appium/Selenium and Cucumber'
